@@ -23,7 +23,16 @@ const val EXTRA_SERVICE_NAG_ID = "service_nag_id"
 const val EXTRA_SERVICE_NAG_LABEL = "service_nag_label"
 
 private const val FGS_NOTIFICATION_ID = 1
-private const val NAG_NOTIFICATION_ID = 2
+
+/**
+ * Base for the nag notification's ID, which increments every cycle (see [startLoop]).
+ * Android's notification-enqueue rate limiter specifically throttles repeated *updates*
+ * to an existing notification ID, not fresh ones — and some watch-side notification
+ * relays (Garmin included) appear to de-dup re-posts of the same ID as "the same
+ * notification coming back" rather than something new worth buzzing for again. Using a
+ * new ID every cycle sidesteps both: each post is unambiguously a brand-new notification.
+ */
+private const val NAG_NOTIFICATION_ID_BASE = 1000
 
 /**
  * Keeps re-posting a silent notification every [NAG_INTERVAL_MILLIS] so the paired watch
@@ -38,6 +47,7 @@ class NagForegroundService : Service() {
 
     private var activeNagId: Long = -1
     private var activeLabel: String = "Pester"
+    private var lastPostedNotificationId: Int? = null
 
     inner class LocalBinder : Binder() {
         fun service(): NagForegroundService = this@NagForegroundService
@@ -62,7 +72,8 @@ class NagForegroundService : Service() {
 
     fun stopNagging() {
         loopJob?.cancel()
-        NotificationManagerCompat.from(this).cancel(NAG_NOTIFICATION_ID)
+        lastPostedNotificationId?.let { NotificationManagerCompat.from(this).cancel(it) }
+        lastPostedNotificationId = null
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
@@ -72,9 +83,12 @@ class NagForegroundService : Service() {
         val intervalMillis = NagPrefs.getIntervalSeconds(this) * 1_000L
         loopJob = scope.launch {
             val manager = NotificationManagerCompat.from(this@NagForegroundService)
+            var nextId = NAG_NOTIFICATION_ID_BASE
             while (isActive) {
-                manager.cancel(NAG_NOTIFICATION_ID)
-                manager.notify(NAG_NOTIFICATION_ID, buildNagNotification())
+                val id = nextId++
+                lastPostedNotificationId?.let { manager.cancel(it) }
+                manager.notify(id, buildNagNotification())
+                lastPostedNotificationId = id
                 delay(intervalMillis)
             }
         }
