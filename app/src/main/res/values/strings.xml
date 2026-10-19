@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pester</string>
+    <string name="tab_alarms">Alarms</string>
+    <string name="tab_reminders">Reminders</string>
+    <string name="nag_channel_name">Pester nags</string>
+    <string name="nag_channel_description">Silent, repeating nags from Pester. Your watch buzzes; your phone stays quiet.</string>
+    <string name="fgs_channel_name">Pester is pestering</string>
+    <string name="dismiss_cta">SWAT IT</string>
+    <string name="empty_alarms">No bugs buzzing right now.</string>
+    <string name="empty_reminders">No fireflies waiting to be caught.</string>
+</resources>
