@@ -18,7 +18,8 @@ Use cases:
 - Wake up (see below) and actually get up.
 
 Two front ends, one nag engine: **Reminders** (one-shot) and **Alarms**
-(recurring, day-of-week).
+(recurring, day-of-week). The nag interval is configurable (5-300s, default
+30s) via the gear icon on the main screen.
 
 ## How this idea came about
 
