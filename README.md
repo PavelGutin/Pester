@@ -4,22 +4,62 @@ An alarm/reminder app that refuses to be dismissed from across the room.
 
 ## Why
 
-Smartwatches mirror phone notifications and buzz for them independently of
-whether the phone itself makes any sound. Pester exploits exactly that: it
-schedules an alarm or reminder like normal, but when it fires it **never
-rings or vibrates the phone itself** — it just keeps re-posting a silent
-notification every 30 seconds. Your paired watch (Garmin, Wear OS, whatever)
-buzzes on every one of those, because that's how it's configured to behave
-for any notification. The phone can sit in another room, silent, and the
-only way to stop the nagging is to physically walk over, pick it up, and hit
-**SWAT IT** inside the app. A notification swipe or a half-asleep wrist tap
-does nothing.
+Some things need to actually happen, not just get acknowledged. Your spouse
+asks you to move the laundry to the dryer, you say "yep," and then forty-five
+minutes later it's still sitting there wet because a single "ok" to another
+person is not a system — it's a thing you meant to remember. Same shape of
+problem shows up everywhere:
+
+- "Move the laundry to the dryer" — said out loud, immediately forgotten.
+- Something's defrosting on the counter and needs to go in the oven by 5:30,
+  or dinner's two hours later than planned.
+- Take the trash cans in from the curb before you leave for work, not after
+  you've already backed out of the driveway.
+- Take your medication with lunch, not whenever you happen to remember you
+  didn't.
+- Bread's proofing, meat's marinating, something needs to come off the
+  stove in 10 minutes — any kitchen task where a single timer alert is easy
+  to half-hear and ignore.
+
+A normal reminder app pings you once. You swipe it away — on purpose or by
+reflex — and the task is now *more* forgotten than before, because your
+brain filed it as "handled." Pester's whole premise is that dismissing the
+notification and actually doing the thing are two different actions, and it
+refuses to treat them as the same one. It keeps nagging, repeatedly, until
+you open the app itself and confirm the task is done — not until you've
+cleared a notification.
 
 Two front ends over one nag engine:
-- **Alarms** — recurring, day-of-week wake-up calls.
-- **Reminders** — one-shot "do not let me forget this" nudges.
+- **Reminders** — one-shot "this needs to happen, and soon" nudges. The
+  general-purpose case above.
+- **Alarms** — recurring, day-of-week wake-up calls, for when the task is
+  "get up."
 
-Both nag identically once triggered. No snooze, anywhere, on purpose.
+Both nag identically once triggered: every 30 seconds, repeatedly, until you
+open the app and hit **SWAT IT**. No snooze, anywhere, on purpose — snoozing
+is just a slower way of doing the thing Pester exists to prevent.
+
+## How this idea came about
+
+The idea started from a narrower, more personal problem: I use a Garmin
+watch as my morning alarm because its vibration is quiet enough not to wake
+the rest of the household — but that also makes it trivially easy to
+dismiss with a half-asleep wrist tap, so I kept not actually waking up.
+Putting a loud phone alarm in another room (the classic "walk across the
+room to turn it off" trick) wasn't an option either, since any sound loud
+enough to hear from elsewhere in the house would wake everyone else too.
+
+The fix turned out to be a neat trick: smartwatches buzz for *any* mirrored
+phone notification, independently of whether the phone itself makes a sound
+or vibrates. So the phone doesn't need to ring at all — it can sit in
+another room, completely silent, and just keep re-posting a notification.
+The watch buzzes every time, the phone never does, and the only way to stop
+it is to walk over and deal with it directly. Once that mechanism existed,
+it was obvious it wasn't really an alarm-clock feature — it was a general
+"keep nagging me until I actually handle this" engine that happens to be
+useful for alarms too. The Garmin angle is still in there (see
+[Testing against a real Garmin](#testing-against-a-real-garmin)), but it's
+one use case among several now, not the point of the app.
 
 ## Design
 
