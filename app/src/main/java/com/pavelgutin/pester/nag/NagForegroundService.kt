@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.pavelgutin.pester.PesterApp
 import com.pavelgutin.pester.R
+import com.pavelgutin.pester.data.NagPrefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -20,9 +21,6 @@ import kotlinx.coroutines.launch
 
 const val EXTRA_SERVICE_NAG_ID = "service_nag_id"
 const val EXTRA_SERVICE_NAG_LABEL = "service_nag_label"
-
-/** How often the nag notification is re-posted while active. */
-const val NAG_INTERVAL_MILLIS = 30_000L
 
 private const val FGS_NOTIFICATION_ID = 1
 private const val NAG_NOTIFICATION_ID = 2
@@ -71,12 +69,13 @@ class NagForegroundService : Service() {
 
     private fun startLoop() {
         loopJob?.cancel()
+        val intervalMillis = NagPrefs.getIntervalSeconds(this) * 1_000L
         loopJob = scope.launch {
             val manager = NotificationManagerCompat.from(this@NagForegroundService)
             while (isActive) {
                 manager.cancel(NAG_NOTIFICATION_ID)
                 manager.notify(NAG_NOTIFICATION_ID, buildNagNotification())
-                delay(NAG_INTERVAL_MILLIS)
+                delay(intervalMillis)
             }
         }
     }

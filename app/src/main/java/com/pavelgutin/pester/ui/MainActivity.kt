@@ -12,9 +12,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -103,6 +106,10 @@ private fun PesterApp(
     var selectedTab by remember { mutableIntStateOf(0) }
     var editing by remember { mutableStateOf<NagEntity?>(null) }
     var creatingType by remember { mutableStateOf<NagType?>(null) }
+    var showIntervalDialog by remember { mutableStateOf(false) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var intervalSeconds by remember { mutableIntStateOf(com.pavelgutin.pester.data.NagPrefs.getIntervalSeconds(context)) }
 
     val alarms by viewModel.alarms.collectAsState()
     val reminders by viewModel.reminders.collectAsState()
@@ -119,12 +126,24 @@ private fun PesterApp(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
-            Text(
-                text = "Pester",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(start = 20.dp, top = 12.dp, bottom = 4.dp)
-            )
+            Row(
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Pester",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.weight(1f).padding(start = 20.dp, top = 12.dp, bottom = 4.dp)
+                )
+                androidx.compose.material3.IconButton(onClick = { showIntervalDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Nag interval settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             if (needsExactAlarmPermission() || needsBatteryExemption()) {
                 PermissionBanners(
@@ -183,6 +202,17 @@ private fun PesterApp(
             existing = nag,
             onDismiss = { editing = null },
             onSave = { viewModel.save(it) }
+        )
+    }
+
+    if (showIntervalDialog) {
+        NagIntervalDialog(
+            initialSeconds = intervalSeconds,
+            onDismiss = { showIntervalDialog = false },
+            onSave = { seconds ->
+                com.pavelgutin.pester.data.NagPrefs.setIntervalSeconds(context, seconds)
+                intervalSeconds = seconds
+            }
         )
     }
 }
