@@ -47,6 +47,37 @@ mosquito.
 Or grab the latest debug APK from the
 [Releases](../../releases) page and sideload it directly.
 
+## Testing against a real Garmin
+
+This is the part that matters: the phone must stay silent and the watch must
+still buzz. Here's how to actually verify that end to end.
+
+1. Pair your Garmin with the phone running Pester via the **Garmin Connect**
+   app, if it isn't already.
+2. In Garmin Connect, go to the device's **Notifications** settings and
+   confirm **Pester** is allowed through (not in an excluded-apps list). Some
+   Garmin models also have a **Do Not Disturb** schedule on the watch itself
+   under Settings → Notifications — make sure it isn't active during your
+   test window, and check the watch's own "vibrate on notification" setting
+   is on.
+3. Put the phone on **silent/vibrate-off** (or just confirm Pester's two
+   notification channels — "Pester nags" and "Pester is pestering" — are set
+   to no sound/no vibration in Android's own per-app notification settings,
+   which is their default on first install).
+4. Create an Alarm or Reminder in Pester a couple of minutes out. Leave the
+   phone screen off, ideally in another room.
+5. Expected result: the phone makes **zero** sound or vibration. The watch
+   buzzes once the nag fires, then keeps buzzing roughly every 30 seconds —
+   each cycle is a fresh notification (Pester cancels and re-posts rather
+   than updating in place) specifically so the watch treats every cycle as a
+   new alert worth buzzing for, not a silent update it can ignore.
+6. Walk to the phone, open Pester (tapping the notification works even
+   screen-off, since it's a full-screen intent), and hit **SWAT IT**.
+   Confirm the watch stops buzzing within that same cycle.
+7. If the watch never buzzes at all: check step 2 again first — a Garmin
+   notification exclusion or an active watch-side Do Not Disturb schedule is
+   the most common cause, not a bug in the app.
+
 ## Architecture
 
 - `data/` — Room entity/DAO for the shared `Nag` model (alarms and

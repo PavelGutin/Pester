@@ -1,12 +1,17 @@
 package com.pavelgutin.pester.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -32,6 +37,7 @@ private val weekOrder = listOf(
     DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNagDialog(
     type: NagType,
@@ -65,13 +71,13 @@ fun EditNagDialog(
                 if (type == NagType.ALARM) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         weekOrder.forEach { day ->
-                            FilterChip(
+                            DayToggle(
+                                label = day.name.take(1),
                                 selected = day in days,
-                                onClick = { days = if (day in days) days - day else days + day },
-                                label = { Text(day.name.take(1)) }
+                                onClick = { days = if (day in days) days - day else days + day }
                             )
                         }
                     }
@@ -106,3 +112,19 @@ fun EditNagDialog(
 }
 
 private fun NagType.display() = if (this == NagType.ALARM) "alarm" else "reminder"
+
+@Composable
+private fun DayToggle(label: String, selected: Boolean, onClick: () -> Unit) {
+    val background = if (selected) MaterialTheme.colorScheme.primary else androidx.compose.ui.graphics.Color.Transparent
+    val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+    androidx.compose.foundation.layout.Box(
+        contentAlignment = androidx.compose.ui.Alignment.Center,
+        modifier = Modifier
+            .size(34.dp)
+            .background(background, androidx.compose.foundation.shape.CircleShape)
+            .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, androidx.compose.foundation.shape.CircleShape)
+            .clickable(onClick = onClick)
+    ) {
+        Text(text = label, color = contentColor, style = MaterialTheme.typography.labelLarge)
+    }
+}

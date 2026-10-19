@@ -121,49 +121,56 @@ private fun DismissScreen(label: () -> String, onSwat: () -> Unit, onDone: () ->
                 modifier = Modifier.padding(bottom = 48.dp)
             )
 
-            Box(contentAlignment = Alignment.Center) {
-                Button(
-                    onClick = {
-                        squashed = true
-                        showBurst = true
-                        onSwat()
-                    },
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MosquitoPink,
-                        contentColor = MaterialTheme.colorScheme.onBackground
-                    ),
-                    modifier = Modifier
-                        .size(180.dp)
-                        .graphicsLayer(scaleX = scale, scaleY = scale)
-                ) {
-                    Text(
-                        text = "SWAT IT",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black
-                    )
+            SwatButton(
+                scale = scale,
+                showBurst = showBurst,
+                onClick = {
+                    squashed = true
+                    showBurst = true
+                    onSwat()
                 }
-
-                AnimatedVisibility(
-                    visible = showBurst,
-                    enter = scaleIn(initialScale = 0.4f) + fadeIn(),
-                    exit = scaleOut(targetScale = 1.6f) + fadeOut()
-                ) {
-                    Text(
-                        text = "BZZZT!",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.background.copy(alpha = 0f))
-                    )
-                }
-            }
+            )
         }
     }
 
     if (showBurst) {
         LaunchedBurstTimeout(onTimeout = onDone)
+    }
+}
+
+@Composable
+private fun SwatButton(scale: Float, showBurst: Boolean, onClick: () -> Unit) {
+    Box(contentAlignment = Alignment.Center) {
+        Button(
+            onClick = onClick,
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MosquitoPink,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier
+                .size(180.dp)
+                .graphicsLayer(scaleX = scale, scaleY = scale)
+        ) {
+            Text(
+                text = "SWAT IT",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black
+            )
+        }
+
+        AnimatedVisibility(
+            visible = showBurst,
+            enter = scaleIn(initialScale = 0.4f) + fadeIn(),
+            exit = scaleOut(targetScale = 1.6f) + fadeOut()
+        ) {
+            Text(
+                text = "BZZZT!",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Black,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 
